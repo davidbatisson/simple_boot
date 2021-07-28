@@ -57,7 +57,7 @@ pipeline {
 										sudo docker rmi simple-boot || true 
 									''' 
 								), 
-								sshTransfer(x² 
+								sshTransfer( 
 									sourceFiles:"target/*.jar", 
 									removePrefix: "target", 
 									remoteDirectory: "//home//ec2-user", 
