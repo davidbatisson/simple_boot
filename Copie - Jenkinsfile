@@ -43,41 +43,17 @@ pipeline {
                 sh 'mvn package -DskipTests'
             }
         }
-		stage('SSH transfert') { 
-			steps { 
-				script { 
-					sshPublisher( 
-						publishers: [ 
-							sshPublisherDesc(configName: 'ec2-host', transfers:[ 
-								sshTransfer( 
-										execCommand: ''' 
-										echo "-=- Cleaning project -=-" 
-										sudo docker stop simple-boot-cont || true 
-										sudo docker rm simple-boot-cont || true 
-										sudo docker rmi simple-boot || true 
-									''' 
-								), 
-								sshTransfer(x² 
-									sourceFiles:"target/*.jar", 
-									removePrefix: "target", 
-									remoteDirectory: "//home//ec2-user", 
-									execCommand: "ls /home/ec2-user" 
-								), 
-								sshTransfer( 
-									sourceFiles:"Dockerfile", 
-									removePrefix: "", 
-									remoteDirectory: "//home//ec2-user", 
-									execCommand: ''' 
-										cd /home/ec2-user; 
-										sudo docker build -t simple-boot .; 
-										sudo docker run -d --name simple-boot-cont -p 8080:8080 simple-boot; 
-									''' 
-								) 
-							]) 
-						]
-					) 
-				} 
-			}
-		}
+        stage('Docker'){
+            steps {
+                sh 'echo "---=--- Docker ---=---"'
+                sh 'docker build -t davidb63/myboot:1.0 .'
+            }
+        }
+        stage('Deploy To local'){
+            steps {
+                sh 'echo "---=--- Deploy To local ---=---"'
+                sh 'docker run -d --name myboot -p 8180:8180 davidb63/myboot:1.0'
+            }
+        }
     }
 }
